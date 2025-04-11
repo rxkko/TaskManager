@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Task Manager</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 2rem;
+            background-color: #f5f5f5;
+        }
+
+        .task {
+            background-color: white;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        form {
+            margin-bottom: 2rem;
+        }
+
+        input, textarea {
+            display: block;
+            margin: 0.5rem 0;
+            padding: 0.5rem;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        button {
+            padding: 0.5rem 1rem;
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .delete-btn {
+            background-color: #ef4444;
+            margin-left: 1rem;
+        }
+
+        .edit-btn {
+            background-color: #f59e0b;
+            margin-left: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <h1>Мои задачи</h1>
+
+    <!-- Форма добавления новой задачи -->
+    <form action="/tasks/create" method="post">
+        <input type="text" name="title" placeholder="Заголовок" required>
+        <textarea name="description" placeholder="Описание" required></textarea>
+        <button type="submit">Добавить задачу</button>
+    </form>
+
+    <!-- Список задач -->
+    {% for task in tasks %}
+    <div class="task">
+        <h2>{{ task.title }}</h2>
+        <p>{{ task.description }}</p>
+
+        <!-- Удаление -->
+        <form action="/tasks/delete/{{ task.id }}" method="post" style="display: inline;">
+            <button type="submit" class="delete-btn">Удалить</button>
+        </form>
+
+        <!-- Показать/скрыть форму редактирования -->
+        <button type="button" onclick="toggleEditForm('{{ task.id }}')" class="edit-btn">Редактировать</button>
+
+        
+        
+        <!-- Форма редактирования -->
+        <form action="/tasks/edit/{{ task.id }}" method="put" id="edit-form-{{ task.id }}" style="display:none; margin-top: 1rem;">
+            <input type="text" name="title" value="{{ task.title }}" required>
+            <textarea name="description" required>{{ task.description }}</textarea>
+            <button type="submit">Сохранить</button>
+        </form>
+    </div>
+    {% endfor %}
+
+    <script>
+        function toggleEditForm(taskId) {
+            const form = document.getElementById(`edit-form-${taskId}`);
+            form.style.display = (form.style.display === "none") ? "block" : "none";
+        }
+    </script>
+</body>
+</html>
