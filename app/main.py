@@ -2,7 +2,6 @@ from fastapi import FastAPI
 from database import create_tables
 from contextlib import asynccontextmanager
 from api import tasks
-from fastapi.staticfiles import StaticFiles
 
 
 @asynccontextmanager

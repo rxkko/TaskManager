@@ -3,6 +3,7 @@ from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
+from schemas.schemas import TaskCreate, TaskUpdate
 
 from database import get_db
 from models.models import Task
@@ -21,38 +22,37 @@ async def task_list(request: Request, db: AsyncSession = Depends(get_db)):
 
 @router.post("/create")
 async def create_task(
-    title: str = Form(...),
-    description: str = Form(...),
+    task: TaskCreate,
     db: AsyncSession = Depends(get_db)
 ):
-    new_task = Task(title=title, description=description)
+    new_task = Task(**task.model_dump())
     db.add(new_task)
     await db.commit()
-    return RedirectResponse(url="/tasks", status_code=303)
+    await db.refresh(new_task)
 
 
-@router.post("/edit/{task_id}")
+@router.put("/edit/{task_id}")
 async def update_task(
     task_id: int,
-    new_title: str = Form(...),
-    new_description: str = Form(...),
+    update_task: TaskUpdate,
     db: AsyncSession = Depends(get_db)
 ):
-    task = await db.execute(select(Task).filter(Task.id == task_id))
+    result = await db.execute(select(Task).filter(Task.id == task_id))
+    task = result.scalar_one_or_none()
 
     if not task:
         raise HTTPException(status_code=404, detail="Task not found")
 
-    task.title = new_title
-    task.description = new_description
-    db.add(task)
+    task.title = update_task.title
+    task.description = update_task.description
     await db.commit()
-    return RedirectResponse(url="/", status_code=303)
+    await db.refresh(task)
+    #return task
 
-@router.post("/delete/{task_id}")
+
+@router.delete("/delete/{task_id}")
 async def delete_task(task_id: int, db: AsyncSession = Depends(get_db)):
     task = await db.get(Task, task_id)
     if task:
         await db.delete(task)
         await db.commit()
-    return RedirectResponse(url="/tasks", status_code=303)

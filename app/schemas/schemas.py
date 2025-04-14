@@ -1,5 +1,4 @@
 from pydantic import BaseModel, EmailStr
-import datetime
 
 
 class UserCreate(BaseModel):
@@ -21,6 +20,15 @@ class TaskCreate(BaseModel):
         orm_mode = True
 
 
+class TaskUpdate(BaseModel):
+    title: str
+    description: str
+    completed: bool = False
+
+    class Config:
+        orm_mode = True
+
+        
 # class TaskWithUser(TaskCreate):
 #     id: int
 #     user_id: int
