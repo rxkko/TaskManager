@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Регистрация</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 2rem;
+      background-color: #f4f4f4;
+    }
+
+    form {
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+      max-width: 400px;
+      margin: 0 auto;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 1rem;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      background-color: #4CAF50;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    .message {
+      margin-top: 1rem;
+      color: green;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+<h2 style="text-align:center">Регистрация</h2>
+
+<form id="register-form">
+  <input type="text" id="username" placeholder="Имя пользователя" required>
+  <input type="email" id="email" placeholder="Email" required>
+  <input type="password" id="password" placeholder="Пароль" required>
+  <button type="submit">Зарегистрироваться</button>
+</form>
+
+<div class="message" id="message"></div>
+
+<script>
+  const form = document.getElementById("register-form");
+  const message = document.getElementById("message");
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const payload = {
+      username: form.username.value,
+      email: form.email.value,
+      password: form.password.value
+    };
+
+    try {
+      const response = await fetch("/register/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        localStorage.setItem("access_token", data.access_token);
+        window.location.href = "/tasks";
+        message.textContent = "Успешная регистрация! Добро пожаловать.";
+        message.style.color = "green";
+        form.reset();
+      } else {
+        const error = await response.json();
+        message.textContent = "Ошибка: " + (error.detail || "Неизвестная ошибка");
+        message.style.color = "red";
+      }
+    } catch (err) {
+      message.textContent = "Ошибка сети";
+      message.style.color = "red";
+    }
+  });
+</script>
+
+</body>
+</html>

@@ -80,7 +80,22 @@
     </div>
 
     <script>
-        
+        async function fetchTasks() {
+        const token = localStorage.getItem("access_token");
+        const response = await fetch("/tasks", {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        });
+
+        if (response.ok) {
+            const tasks = await response.json();
+            console.log(tasks); // Выводим задачи на страницу
+        } else {
+            alert("Failed to fetch tasks");
+        }
+    }
         document.getElementById('create-task-form').addEventListener('submit', async function(event) {
             event.preventDefault();
             const form = event.target;

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f4f4; }
+        .login-container { 
+            max-width: 400px; 
+            margin: 100px auto; 
+            padding: 20px; 
+            border: 1px solid #ccc; 
+            background-color: white; 
+            border-radius: 8px; 
+        }
+        input { width: 100%; padding: 10px; margin: 10px 0; }
+        button { width: 100%; padding: 10px; background-color: #4CAF50; color: white; border: none; cursor: pointer; }
+        button:hover { background-color: #45a049; }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h2>Login</h2>
+        <form id="loginForm">
+            <input type="text" id="username" placeholder="Username" required>
+            <input type="password" id="password" placeholder="Password" required>
+            <button type="submit">Login</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById("loginForm").addEventListener("submit", async function (event) {
+            event.preventDefault();
+
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+
+            // Отправка POST запроса на сервер с логином и паролем
+            const response = await fetch("/register/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ username, password })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                // Сохранение токена в localStorage
+                localStorage.setItem("access_token", data.access_token);
+                alert("Login successful");
+
+                // Перенаправление на защищенную страницу (например, dashboard)
+                window.location.href = "/tasks";
+            } else {
+                const error = await response.json();
+                alert("Login failed: " + error.detail);
+            }
+        });
+    </script>
+</body>
+</html>

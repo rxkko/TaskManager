@@ -1,7 +1,8 @@
 from fastapi import FastAPI
 from database import create_tables
 from contextlib import asynccontextmanager
-from api import tasks
+from crud import task
+from api import auth
 
 
 @asynccontextmanager
@@ -12,10 +13,5 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
-app.include_router(tasks.router, prefix="/tasks", tags=["tasks"])
-
-
-
-@app.get("/")
-async def root():
-    return {"message": "Добро пожаловать в Task Manager!"}
+app.include_router(task.router, prefix="/tasks", tags=["tasks"])
+app.include_router(auth.router, prefix="/register", tags=["tasks"])
