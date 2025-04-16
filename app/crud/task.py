@@ -6,7 +6,6 @@ from schemas.schemas import TaskCreate, TaskUpdate
 from database import get_db
 from models.models import Task, User
 from core.deps import get_current_user
-from typing import List
 from fastapi.responses import HTMLResponse
 
 
@@ -47,7 +46,6 @@ async def update_task(
     task.description = update_task.description
     await db.commit()
     await db.refresh(task)
-    #return task
 
 
 @router.delete("/delete/{task_id}")
